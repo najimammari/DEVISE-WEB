@@ -1,0 +1,329 @@
+<form action="" id="formId" name="form" method="post" class="form-horizontal">
+  <div class="alert alert-danger" *ngIf="listErrorMsgs && listErrorMsgs.length > 0">
+    <strong>Message d'erreur: </strong>
+    <ul class="list-group">
+      <li *ngFor="let err of listErrorMsgs" class="list-group list-group-accent">{{err}}</li>
+    </ul>
+  </div>
+  <div class="alert alert-info" *ngIf="listInfoMsgs && listInfoMsgs.length > 0">
+    <strong>Message d'information</strong>
+    <ul>
+      <li *ngFor="let info of listInfoMsgs">{{info}}</li>
+    </ul>
+  </div>
+<div class="panel panel-primary">
+  <div class="panel-heading">Informations communes</div>
+  <div class="panel-body">
+    <div class="row rowStyle">
+      <div class="col-sm-2">Import/Export</div>
+      <div class="col-sm-6">
+        <mat-radio-group id="sensId" name="sens" aria-label="Select an option" [(ngModel)]="declaration.sensDeclaration">
+          <mat-radio-button value="IMPORT">Import</mat-radio-button>
+          <mat-radio-button value="EXPORT">Export</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </div>
+    <div class="row rowStyle" *ngIf="declaration.sensDeclaration == 'EXPORT'">
+      <div class="col-sm-2">Nature Justificatif</div>
+      <div class="col-sm-6">
+        <select  id="typeJustificatifId" name="typeJustificatif"
+                 class="form-control" [(ngModel)]="declaration.justificatif.typeJustificatif" required>
+          <option value="">---Choisir le type du justificatif---</option>
+<!--          <option value="DECLARATION">Déclaration</option>-->
+<!--          <option value="BORDEREAU">Bordereau de change</option>-->
+          <option *ngFor="let just of typeJustificatifs" [ngValue]="just">
+            {{just}}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row rowStyle" *ngIf="declaration.sensDeclaration == 'EXPORT' && declaration.justificatif.typeJustificatif == 'Déclaration'">
+      <div class="col-sm-2">Référence Déclaration</div>
+      <div class="col-md-6">
+        <input name="refDec" id="refDecId" type="text" [(ngModel)]="declaration.justificatif.referenceDeclaration"/>
+      </div>
+    </div>
+    <div class="row rowStyle" *ngIf="declaration.sensDeclaration == 'EXPORT' && declaration.justificatif.typeJustificatif == 'Déclaration'">
+      <div class="col-sm-2">Déclaration</div>
+      <div class="col-md-6">
+        <input name="uploadFile"   id="doc" type="file" accept="application/pdf" size="2M" (change)="handleInputChange($event,doc)" #doc />
+      </div>
+    </div>
+    <div class="row rowStyle" *ngIf="declaration.sensDeclaration == 'EXPORT' && declaration.justificatif.typeJustificatif == 'Bordereau de change'">
+      <div class="col-sm-2">Référence Bordereau</div>
+      <div class="col-md-6">
+        <input name="refBor" id="refBorId" type="text" [(ngModel)]="declaration.justificatif.referenceBordereau"/>
+      </div>
+    </div>
+    <div class="row rowStyle" *ngIf="declaration.sensDeclaration == 'EXPORT' && declaration.justificatif.typeJustificatif == 'Bordereau de change'">
+      <div class="col-sm-2">Bordereau de change</div>
+      <div class="col-md-6">
+        <input name="uploadFile"   id="doc1" type="file" accept="application/pdf" size="2M" (change)="handleInputChange($event,doc1)" #doc1 />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">Informations sur le voyage</div>
+  <div class="panel-body">
+    <div class="row rowStyle">
+      <div class="col-sm-2">Date d'arrivée</div>
+      <div class="col-sm-6">
+
+        <div class="form-group">
+          <mat-form-field appearance="fill">
+            <input matInput id="dateArriveeId" name="dateArrivee" (click)="pickerDateDebut.open()"  readonly [matDatepicker]="pickerDateDebut"
+                   [placeholder]="'Choisir la date'" [(ngModel)]="declaration.voyage.dateArrive">
+            <mat-datepicker-toggle matSuffix [for]="pickerDateDebut"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDateDebut></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+    <div class="row rowStyle">
+      <div class="col-sm-2">Provenance</div>
+      <div class="col-sm-6">
+        <select  id="provenanceId" name="provenance"
+                 class="form-control" [(ngModel)]="declaration.voyage.paysProvenance"  required>
+          <option value="">---Choisir le Pays---</option>
+          <option *ngFor="let p of pays" [ngValue]="p">
+            {{p.nomPays}} ({{p.codePays}})
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row rowStyle">
+      <div class="col-sm-2">Poste frontalier</div>
+      <div class="col-sm-6">
+        <select  id="posteFrontalierId" name="posteFrontalier"
+                 class="form-control" [(ngModel)]="declaration.voyage.pointFrontalier"  required>
+          <option value="">---Choisir le poste frontalier---</option>
+          <option *ngFor="let poste of posteFrontaliers" [ngValue]="poste">
+            {{poste.libelle}}
+          </option>
+        </select>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">Informations sur le déclarant</div>
+  <div class="panel-body">
+    <div class="row rowStyle">
+      <div class="col-sm-2">Identifiant</div>
+      <div class="col-sm-3">
+        <select  id="typeIdentifiantId" name="typeIdentifiant"
+                class="form-control" [(ngModel)]="declaration.voyageur.typeIdentifiant"  required>
+          <option value="">---Type Identifiant---</option>
+          <option *ngFor="let identifiant of typeIdentifiants" [ngValue]="identifiant">
+            {{identifiant.libelle}}
+          </option>
+        </select>
+      </div>
+      <div class="col-sm-2">
+        <input type="text" id="identifiantId" name="identifiant"  matInput [(ngModel)]="declaration.voyageur.identifiant" required>
+      </div>
+    </div>
+    <div class="row rowStyle">
+      <div class="col-sm-2">Nom</div>
+      <div class="col-sm-3">
+        <input type="text" id="nomId" name="nom" matInput [(ngModel)]="declaration.voyageur.nom"  required>
+      </div>
+    </div>
+      <div class="row rowStyle">
+        <div class="col-sm-2">Prenom</div>
+        <div class="col-sm-3">
+          <input type="text" id="prenomId" name="prenom" matInput [(ngModel)]="declaration.voyageur.prenom" required>
+        </div>
+      </div>
+    <div class="row rowStyle">
+      <div class="col-sm-2">Nationalite</div>
+      <div class="col-sm-6">
+
+        <select  id="nationaliteId" name="nationalite"
+                 class="form-control" [(ngModel)]="declaration.voyageur.paysNationalite"  required>
+          <option value="">---Choisir la Nationalite---</option>
+          <option *ngFor="let pn of pays" [ngValue]="pn">
+            {{pn.nomPays}} ({{pn.codePays}})
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row rowStyle">
+      <div class="col-sm-2">Adresse au Maroc</div>
+      <div class="col-sm-3">
+        <textarea type="text" id="adresseId" name="adresse" [(ngModel)]="declaration.voyageur.adresseMaroc"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Resident</div>
+      <div class="col-sm-3">
+        <section class="example-section" ngDefaultControl id="residentId" name="resident"   [(ngModel)]="declaration.voyageur.resident" >
+          <mat-checkbox value="true" class="example-margin"></mat-checkbox>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">Informations sur les devises</div>
+  <div class="panel-body">
+    <div class="row rowStyle">
+      <div class="col-sm-2">Devise</div>
+      <div class="col-sm-6">
+
+        <select  id="deviseId" name="devise"
+                 class="form-control" [(ngModel)]="ligneDevise.typeDevise" required>
+          <option value="">---Choisir la Devise---</option>
+          <option *ngFor="let devise of typeDevises" [ngValue]="devise">
+            {{devise.nomDevise}} ({{devise.codeDevise}})
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row rowStyle">
+      <div class="col-sm-2">Montant</div>
+      <div class="col-sm-3">
+        <input type="number" id="montantId" name="montant" [(ngModel)]="ligneDevise.montant" matInput>
+      </div>
+      <div class="col-md-2">
+        <button mat-raised-button (click)="addLigneDevise()">Ajouter une ligne devise</button>
+      </div>
+    </div>
+    <div class="row rowStyle">
+      <div class="col-sm-9">
+        <table class="table table-bordered table-striped table-sm" *ngIf="ligneDevises != null && ligneDevises.length > 0">
+          <thead>
+          <tr>
+            <th>Code Devise</th>
+            <th>Libellé Devise</th>
+            <th>Montant</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let dv of ligneDevises">
+            <td>{{dv.typeDevise.codeDevise}}</td>
+            <td>{{dv.typeDevise.nomDevise}}
+            <td>{{dv.montant}}</td>
+            <td align="center">
+              <button mat-button (click)="deleteLigneDevise(dv)">Supprimer</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">Informations sur les Titres au porteur</div>
+    <div class="panel-body">
+      <div class="row rowStyle">
+        <div class="col-sm-2">Nature du Titre</div>
+        <div class="col-sm-6">
+
+          <select  id="natureTitreId" name="natureTitre"
+                   class="form-control" [(ngModel)]="titrePorteur.natureTitre" required>
+            <option value="">---Choisir la nature du titre---</option>
+<!--            <option value="ACTIONS">ACTIONS</option>-->
+<!--            <option value="OBLIGATIONS">OBLIGATIONS</option>-->
+<!--            <option value="BON_DE_CAISSE">BON DE CAISSE</option>-->
+<!--            <option value="AUTRES">AUTRES</option>-->
+            <option *ngFor="let titre of natureTitres" [ngValue]="titre">
+              {{titre}}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="row rowStyle">
+        <div class="col-sm-2">Reference titre</div>
+        <div class="col-sm-6">
+          <input type="text" id="referenceId" name="reference" [(ngModel)]="titrePorteur.referenceTitre" matInput>
+        </div>
+      </div>
+      <div class="row rowStyle">
+        <div class="col-sm-2">Emetteur</div>
+        <div class="col-sm-6">
+          <input type="text" id="emetteurId" name="emetteur" [(ngModel)]="titrePorteur.emetteur" matInput>
+        </div>
+      </div>
+      <div class="row rowStyle">
+        <div class="col-sm-2">Devise</div>
+        <div class="col-sm-6">
+          <select  id="deviseTitreId" name="deviseTitre"
+                   class="form-control" [(ngModel)]="titrePorteur.typeDevise" required>
+            <option value="">---Choisir la Devise---</option>
+            <option *ngFor="let devise of typeDevises" [ngValue]="devise">
+              {{devise.nomDevise}} ({{devise.codeDevise}})
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="row rowStyle">
+        <div class="col-sm-2">Montant</div>
+        <div class="col-sm-3">
+          <input type="text" id="montantTitreId" name="montantTitre" [(ngModel)]="titrePorteur.montant" matInput>
+        </div>
+        <div class="col-md-2">
+          <button mat-raised-button (click)="addTitrePorteur()">Ajouter un titre au porteur</button>
+        </div>
+      </div>
+      <div class="row rowStyle">
+        <div class="col-sm-9">
+          <table class="table table-bordered table-striped table-sm" *ngIf="titrePorteurs != null && titrePorteurs.length > 0">
+            <thead>
+            <tr>
+              <th>Référence Titre</th>
+              <th>Code Devise</th>
+              <th>Libellé Devise</th>
+              <th>Emetteur</th>
+              <th>Nature Titre</th>
+              <th>Montant</th>
+              <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let tr of titrePorteurs">
+              <td>{{tr.referenceTitre}}</td>
+              <td>{{tr.typeDevise.codeDevise}}</td>
+              <td>{{tr.typeDevise.nomDevise}}</td>
+              <td>{{tr.emetteur}}</td>
+              <td>{{tr.natureTitre}}</td>
+              <td>{{tr.montant}}</td>
+              <td align="center">
+                <button mat-button (click)="deleteTitrePorteur(tr)">Supprimer</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">Soumission de ma déclaration</div>
+    <div class="panel-body">
+      <div class="row rowStyle">
+        <div class="col-md-2">
+          Commentaire
+        </div>
+        <div class="col-md-6">
+          <textarea type="text" id="commentaireId" name="commentaire" [(ngModel)]="declaration.commentaire"></textarea>
+        </div>
+      </div>
+      <div class="row rowStyle">
+        <div class="col-md-10" align="center">
+          <button mat-raised-button (click)="soumettreDeclaration()">Soumettre la déclaration</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
