@@ -7,7 +7,8 @@ import {Declaration} from "../model/Declaration";
   providedIn: 'root'
 })
 export class ReferentielService {
-  baseURL: string = "http://localhost:8082/";
+  //baseURL: string = "http://localhost:8082/";
+  baseURL: string = "http://172.19.144.1:8082/";
   constructor(private http: HttpClient) { }
 
   getPaysValide(): Observable<any> {
